@@ -1,0 +1,453 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Advanced</title>
+<meta http-equiv="Content-Type" content="text/html; charset=big5">
+<link href="/css/stylesheet.css" rel="stylesheet" type="text/css" />
+<script language="JavaScript" src="/js/validate.js"></script>
+<script language="JavaScript" src="/js/common.js"></script>
+<script language="JavaScript" src="/js/message.js"></script>
+<script language="JavaScript" src="/js/swipe.js"></script>
+<script language="JavaScript">
+var AP_FreqBand = "~*AP_FreqBand~";
+var xhr_wifi_apply = null;
+var cu = "~*cu~";
+var setting_radio_lock ="~~WIFI_RADIO_LOCK:0~";
+var setting_chmode_lock ="~~WIFI_RADIO_CH_MODE_LOCK:0~";
+var setting_ch_lock ="~~WIFI_RADIO_CH_LOCK:0~";
+var setting_bw_lock ="~~WIFI_RADIO_BW_LOCK:0~";
+var setting_txpower_lock ="~~WIFI_RADIO_TX_PWR_LOCK:0~";
+var setting_tcp_nat_timer_lock ="~~WIFI_TCP_NAT_TIMER_LOCK:0~";
+var setting_udp_nat_timer_lock ="~~WIFI_UDP_NAT_TIMER_LOCK:0~";
+var oversea = "~*oversea~";
+
+function EnabledWiFiSleepMode()
+{
+	if(document.getElementById("AP_SLEEPMODE_ENABLE").checked == true)//from enable to disable
+	{	
+		document.getElementById("lAP_SLEEPMODE_TIMER").style.display="block";	
+	}
+	else{
+		document.getElementById("lAP_SLEEPMODE_TIMER").style.display="none";
+	}
+}
+
+function wifi_query_callback()
+{	
+    if( xhr_wifi_apply.readyState == 4 )
+    {	  
+        if( xhr_wifi_apply.status == 200 )
+        {
+            var response_text = xhr_wifi_apply.responseText;
+
+            if( response_text != null && response_text.length > 0 )
+            {
+                response_text = escape_nl( response_text );
+                var json_obj = eval("("+response_text+")");
+				
+				if(json_obj.text == "0")
+				{
+					setTimeout("wifi_query_request();", 100);	
+				}
+				else
+				{
+					document.getElementById("WiFiSetting").style.display="block";
+					document.getElementById("divPrimaryNetworkRestarting").style.display="none";					
+				}
+            }					
+        }
+    }
+}
+
+function wifi_query_request() 
+{   
+    if( xhr_wifi_apply == null )
+    {
+        xhr_wifi_apply = createXHR();
+    }
+
+    if (xhr_wifi_apply)
+    {
+        xhr_wifi_apply.open("GET", "/cgi-bin/cm/mWiFi_Config_InProgressAjax.html?cur_time=" + new Date().getTime());
+        xhr_wifi_apply.onreadystatechange = wifi_query_callback;
+        xhr_wifi_apply.send(null);
+    }
+}
+
+function validate_all()
+{
+	var tcp_nat_timer = document.getElementById("tcp_nat_timer").value;
+	if((isInteger(tcp_nat_timer)== false) || parseInt(tcp_nat_timer) < 30 || parseInt(tcp_nat_timer) > 86400)
+	{
+		alert(tcp_nat_timer+" is an invalid TCP NAT Timer");
+		return false;	
+	}
+	
+	var udp_nat_timer = document.getElementById("udp_nat_timer").value;
+	if((isInteger(udp_nat_timer)== false) || parseInt(udp_nat_timer) < 30 || parseInt(udp_nat_timer) > 86400)
+	{
+		alert(udp_nat_timer+" is an invalid UDP NAT Timer");
+		return false;	
+	}	
+	
+	if ( confirm ("Changing Wi-Fi settings will cause Wi-Fi connection to be disconnected in order to make "+
+			"Wi-Fi settings effective. \n\nAre you sure to change Wi-Fi settings now?") == false)
+	{
+		return false;	
+	}
+	document.getElementById("WiFiSetting").style.display="none";
+	document.getElementById("divPrimaryNetworkRestarting").style.display="block";
+	wifi_query_request();
+	document.getElementById("AP_FreqBand_VALUE").value=1;
+	if(document.getElementById("AP_FreqBand_5g").checked)
+		document.getElementById("AP_FreqBand_VALUE").value = 2;	
+		
+	document.getElementById("AP_CHMODE_VALUE").value = document.getElementById("AP_CHMODE").value;
+	document.getElementById("AP_PRIMARY_CH_VALUE").value = document.getElementById("AP_PRIMARY_CH").value;
+	document.getElementById("AP_Bandwidth_VALUE").value = document.getElementById("AP_Bandwidth").value;
+	document.getElementById("AP_TxPower_VALUE").value = document.getElementById("AP_TxPower").value;
+	document.getElementById("udp_nat_timer_VALUE").value = document.getElementById("udp_nat_timer").value;
+	document.getElementById("tcp_nat_timer_VALUE").value = document.getElementById("tcp_nat_timer").value;	
+	document.forms["myForm"].submit();//submit() 方法把表单数据提交到 Web 服务器
+}
+
+function changeFreqBand()
+{
+	var AP_CHMODE = document.getElementById('AP_CHMODE');	
+	var AP_PRIMARY_CH = document.getElementById("AP_PRIMARY_CH");
+	var AP_Bandwidth = document.getElementById('AP_Bandwidth');
+
+	if(document.getElementById("AP_FreqBand_5g").checked == false)
+	{
+		AP_CHMODE.options.length = 0;
+		AP_PRIMARY_CH.options.length = 0;
+		AP_Bandwidth.options.length = 0;
+		AP_FreqBand = "1";
+	}
+	else
+	{		
+		AP_CHMODE.options.length = 0;
+		AP_PRIMARY_CH.options.length = 0;
+		AP_Bandwidth.options.length = 0;
+		AP_FreqBand = "2";		
+	}
+	
+	update_content();
+}
+
+function update_content()
+{
+	var AP_Bandwidth_2g = "~*AP_Bandwidth_2g~";
+	var AP_CHMODE_2g = "~*AP_CHMODE_2g~";	
+	var AP_AP_PRIMARY_CH_2g = "~*AP_AP_PRIMARY_CH_2g~";	
+	var AP_TxPower_2g = "~*AP_TxPower_2g~";	
+	
+	var AP_Bandwidth_5g = "~*AP_Bandwidth_5g~";
+	var AP_CHMODE_5g = "~*AP_CHMODE_5g~";	
+	var AP_AP_PRIMARY_CH_5g = "~*AP_AP_PRIMARY_CH_5g~";	
+	var AP_TxPower_5g = "~*AP_TxPower_5g~";	
+	var AP_CHMODE = document.getElementById('AP_CHMODE');
+	var AP_PRIMARY_CH = document.getElementById('AP_PRIMARY_CH');
+	var AP_Bandwidth = document.getElementById('AP_Bandwidth');
+	if( oversea == "1")
+	{
+		document.getElementById("AP_FreqBand_5g").disabled = true;
+	}
+	if(AP_FreqBand == "1")//2.4g
+	{
+		document.getElementById("AP_TxPower").value=AP_TxPower_2g;		
+		if(cu == "2")
+		{
+		var opt1 = document.createElement('option');
+		opt1.value = "b+g+n";
+		opt1.innerHTML = "802.11 b/g/n";
+		if(AP_CHMODE_2g == opt1.value)
+		{
+			opt1.setAttribute ("selected", true);
+		}
+		AP_CHMODE.appendChild(opt1);
+		var opt2 = document.createElement('option');
+		opt2.value = "b";
+		opt2.innerHTML = "802.11 b only";
+		if(AP_CHMODE_2g == opt2.value)
+		{
+			opt2.setAttribute ("selected", true);
+		}		
+		AP_CHMODE.appendChild(opt2);
+		var opt3 = document.createElement('option');
+		opt3.value = "g";
+		opt3.innerHTML = "802.11 g only";
+		if(AP_CHMODE_2g == opt3.value)
+		{
+			opt3.setAttribute ("selected", true);
+		}		
+		AP_CHMODE.appendChild(opt3);		
+		var opt4 = document.createElement('option');
+		opt4.value = "n";
+		opt4.innerHTML = "802.11 n only";
+		if(AP_CHMODE_2g == opt4.value)
+		{
+			opt4.setAttribute ("selected", true);
+		}			
+		AP_CHMODE.appendChild(opt4);
+		}
+		else
+			document.getElementById("80211_mode").style.display = "none";
+			
+		for(var i=0;i<=13;i++)
+		{
+			var opt = document.createElement('option');
+			opt.value = i;
+			if(i == 0)
+				opt.innerHTML = "Automatic";
+			else
+				opt.innerHTML = "CH "+i;
+				
+			if(AP_AP_PRIMARY_CH_2g == opt.value)
+			{
+				opt.setAttribute ("selected", true);
+			}				
+			AP_PRIMARY_CH.appendChild(opt);
+		}
+		
+		var opt_20 = document.createElement('option');
+		opt_20.value = 0;
+		opt_20.innerHTML = "20 MHz";
+		if(AP_Bandwidth_2g == opt_20.value)
+		{
+			opt_20.setAttribute ("selected", true);
+		}	
+		AP_Bandwidth.appendChild(opt_20);	
+
+		var opt_40 = document.createElement('option');
+		opt_40.value = 1;
+		opt_40.innerHTML = "Auto(20/40MHz)";
+		if(AP_Bandwidth_2g == opt_40.value)
+		{
+			opt_40.setAttribute ("selected", true);
+		}		
+		AP_Bandwidth.appendChild(opt_40);			
+	}
+	else
+	{
+		document.getElementById("AP_TxPower").value=AP_TxPower_5g;		
+		if(cu=="2")
+		{
+		var opt1 = document.createElement('option');
+		opt1.value = "a+n+ac";
+		opt1.innerHTML = "802.11 a/n/ac";
+		if(AP_CHMODE_5g == opt1.value)
+		{
+			opt1.setAttribute ("selected", true);
+		}			
+		AP_CHMODE.appendChild(opt1);
+		var opt2 = document.createElement('option');
+		opt2.value = "a";
+		opt2.innerHTML = "802.11 a only";
+		if(AP_CHMODE_5g == opt2.value)
+		{
+			opt2.setAttribute ("selected", true);
+		}			
+		AP_CHMODE.appendChild(opt2);
+		var opt3 = document.createElement('option');
+		opt3.value = "n";
+		opt3.innerHTML = "802.11 n only";
+		if(AP_CHMODE_5g == opt3.value)
+		{
+			opt3.setAttribute ("selected", true);
+		}			
+		AP_CHMODE.appendChild(opt3);		
+		var opt4 = document.createElement('option');
+		opt4.value = "ac";
+		opt4.innerHTML = "802.11 ac only";
+		if(AP_CHMODE_5g == opt4.value)
+		{
+			opt4.setAttribute ("selected", true);
+		}			
+		AP_CHMODE.appendChild(opt4);		
+		}
+		else
+			document.getElementById("80211_mode").style.display = "none";		
+		var opt = document.createElement('option');
+		opt.value = 0;		
+		opt.innerHTML = "Automatic";
+		AP_PRIMARY_CH.appendChild(opt);		
+		
+		var opt_20 = document.createElement('option');
+		opt_20.value = 0;
+		opt_20.innerHTML = "20 MHz";
+		if(AP_Bandwidth_5g == opt_20.value)
+		{
+			opt_20.setAttribute ("selected", true);
+		}		
+		AP_Bandwidth.appendChild(opt_20);	
+
+		var opt_40 = document.createElement('option');
+		opt_40.value = 1;
+		opt_40.innerHTML = "40 MHz";
+		if(AP_Bandwidth_5g == opt_40.value)
+		{
+			opt_40.setAttribute ("selected", true);
+		}		
+		AP_Bandwidth.appendChild(opt_40);		
+
+		var opt_80 = document.createElement('option');
+		opt_80.value = 2;
+		opt_80.innerHTML = "Auto(20/40/80 MHz)";
+		if(AP_Bandwidth_5g == opt_80.value)
+		{
+			opt_80.setAttribute ("selected", true);
+		}		
+		AP_Bandwidth.appendChild(opt_80);			
+	}
+	
+	if(cu == "2")
+	{
+		document.getElementById("wifi_mode").innerHTML = "Frequency Band:"; 		
+	}
+	else
+	{
+		document.getElementById("wifi_mode").innerHTML = "Wi-Fi Mode:"; 		
+	}
+	
+	var AP_SLEEPMODE_ENABLE = "~~AP_SLEEPMODE_ENABLE~"
+	if(AP_SLEEPMODE_ENABLE != "1")
+	{
+		document.getElementById("lAP_SLEEPMODE_TIMER").style.display = "none";
+	}
+	
+	leftSwipe("mainContent", "mangt", "", cu, null);
+	if(setting_radio_lock == "1")
+	{
+		document.getElementById("AP_FreqBand").disabled = true;
+		document.getElementById("AP_FreqBand_5g").disabled = true;
+	}
+	
+	if(setting_chmode_lock == "1")
+	{
+		document.getElementById("AP_CHMODE").disabled = true;
+	}	
+	
+	if(setting_ch_lock == "1")
+	{
+		document.getElementById("AP_PRIMARY_CH").disabled = true;
+	}
+
+	if(setting_bw_lock == "1")
+	{
+		document.getElementById("AP_Bandwidth").disabled = true;
+	}
+
+	if(setting_txpower_lock == "1")
+	{
+		document.getElementById("AP_TxPower").disabled = true;
+	}
+	
+	if(setting_tcp_nat_timer_lock == "1")
+	{
+		document.getElementById("tcp_nat_timer").disabled = true;
+	}	
+	
+	if(setting_udp_nat_timer_lock == "1")
+	{
+		document.getElementById("udp_nat_timer").disabled = true;
+	}	
+}
+</script>
+</head>
+
+<body onLoad="update_content();" >
+<form name="myForm" method="post" action="/cgi-bin/cm/mWiFi_Config_Adv_Apply.html">
+<input type="hidden" name="RequestVerifyToken" value="~*token~">
+<input type="hidden" name="AP_FreqBand" id="AP_FreqBand_VALUE">
+<input type="hidden" name="AP_CHMODE" id="AP_CHMODE_VALUE">
+<input type="hidden" name="AP_PRIMARY_CH" id="AP_PRIMARY_CH_VALUE">
+<input type="hidden" name="AP_Bandwidth" id="AP_Bandwidth_VALUE">
+<input type="hidden" name="AP_TxPower" id="AP_TxPower_VALUE">
+<input type="hidden" name="udp_nat_timer" id="udp_nat_timer_VALUE">
+<input type="hidden" name="tcp_nat_timer" id="tcp_nat_timer_VALUE">
+<div class="mainContent" id="mainContent">
+	<div class="maintitle">
+		<label id="title" class="title">Advanced</label>
+	</div>
+	<hr color="#D8D8D8" size="1px" width="100%"> </hr>
+	<div id="Content" class="content">	
+	<label>When Wi-Fi is used abroad, the configuration must be changed according to a local law. If you change Wi-Fi setting, you also need to change setting of Wi-Fi client devices.</label>
+	  <br style="clear:both">	
+	<div id="WiFiSetting">
+		<div class="inlineDiv">
+		<label id="wifi_mode" class="subttl"></label>	
+		<input type="radio" name="AP_FreqBand_ID" id="AP_FreqBand" value="1" ~cAP_FreqBand:1:1~ onChange="changeFreqBand()"><label for="AP_FreqBand">2.4GHz</label>
+		<input type="radio" name="AP_FreqBand_ID" id="AP_FreqBand_5g" value="2" ~cAP_FreqBand:2:2~ onChange="changeFreqBand()"><label for="AP_FreqBand_5g">5GHz</label>
+		</div>	
+	
+	<div class="inlineDiv" id="80211_mode">	
+	<label id="l80211_mode"  class="subttl">Mode:</label>
+	<select id="AP_CHMODE">
+	</select>	
+	</div>	
+	
+	<div class="inlineDiv">
+	<label id="lChannel"  class="subttl">Wi-Fi Channel:</label>
+	<select id="AP_PRIMARY_CH">
+	</select>
+	</div>	
+	
+	<div class="inlineDiv">
+	<label  class="subttl">Wi-Fi Bandwidth:</label>	
+	<select id="AP_Bandwidth" class="grayinput12">
+	</select>
+	</div>
+
+	<div id="nwsleepmode">
+	<div id="nwSSID" class="inlineDiv">
+	<label id="sleep_mode" class="subttl">Sleep Mode:</label>	
+	<input type="radio" name="AP_SLEEPMODE_ENABLE" id="AP_SLEEPMODE_ENABLE" ~cAP_SLEEPMODE_ENABLE:1:1~ value="1" onclick="EnabledWiFiSleepMode()"><label for="AP_SLEEPMODE_ENABLE">Enabled</label>
+	<input type="radio" name="AP_SLEEPMODE_ENABLE" id="AP_SLEEPMODE_DISABLED" ~cAP_SLEEPMODE_ENABLE:0:0~ value="0" onclick="EnabledWiFiSleepMode()"><label for="AP_SLEEPMODE_DISABLED">Disabled</label>
+	</div>
+	<div id="lAP_SLEEPMODE_TIMER" class="inlineDiv">
+	<label id="sleep_mode"  class="subttl">Sleep Mode Timer:</label>
+	<select name="AP_SLEEPMODE_TIMER" id="AP_SLEEPMODE_TIMER">
+	<option value="5" ~sAP_SLEEPMODE_TIMER:5:5~>5 minutes</option>
+	<option value="10" ~sAP_SLEEPMODE_TIMER:10:5~>10 minutes</option>
+	<option value="15" ~sAP_SLEEPMODE_TIMER:15:5~>15 minutes</option>
+	</select>
+	</div>
+	</div>
+	
+	<div class="inlineDiv">
+	<label  class="subttl">TX Power:</label>	
+	<select id="AP_TxPower" class="grayinput12">			
+	<option value="1">High</option>
+	<option value="0">Low</option>
+	</select>
+	</div>
+	<div class="inlineDiv">
+	<label class="subttl">TCP NAT Timer:</label>
+	<input id="tcp_nat_timer" maxlength="5" style="padding-left:5px;" type="text" value='~*tcp_nat_timer~'> second (30 - 86400)
+	</div>
+	<div class="inlineDiv">
+	<label class="subttl">UDP NAT Timer:</label>
+	<input id="udp_nat_timer" maxlength="5" style="padding-left:5px;" type="text" value='~*udp_nat_timer~'> second (30 - 86400)
+	</div>		
+	<div class="formBox" id="divPrimaryNetworkFormBox" align="center">
+	<label class="error" id="lPassErrorMesPN" style="display: none"></label>
+	</div>
+	<div class="buttonStyle" align="left"  id="divSavePrimaryNetworkData">		 
+	<input id="btUpdate" value="Apply" onclick="validate_all()" type="button" style="width:200px;height:200px;">		 	 
+	</div>	
+	</div>
+	 <div id="divPrimaryNetworkRestarting" align="left" style="display:none">
+		<label class="warm" id="lPassErrorMesPN" style="margin-left:25px;margin-bottom:2px">Apply new Wi-Fi settings now. Please wait for several seconds to activate Wi-Fi function.</label>
+		<label class="warm" id="lPassErrorMesPN" style="margin-left:25px">If this page is not refreshed in one minute correctly, please manually connect your devices to device and login to Web UI again.
+		</label>	
+		<br><br>
+		<div align="center">		
+		<img src="/images/loading.gif" width="100" height="100"> 	
+		</div>
+	</div>		
+</div>
+</div>
+</form>
+</body>
+</html>

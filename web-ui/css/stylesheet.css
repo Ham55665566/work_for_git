@@ -1,0 +1,175 @@
+body  {margin: 0px; font-family:helvetica_neuelight, Meiryo, Arial, Tahoma, sans-serif; background:#D8D8D8;}
+a {text-decoration:none; color:#FBF5EF;font-size: 14px;}
+a img {	border:0;	}
+h1 { background-color: #aba8a8;margin-top: -5px;height:50px;width:100%;margin-bottom:-10px;}
+img {margin-top: 5px;}
+iframe {   overflow: hidden;}
+hr {height:1px;border:none;color:#D8D8D8;background-color:#D8D8D8;width:100%}
+.newlogo 	{height:15px; margin-top: 4px;}
+.newlogo img	{padding-top: 10px;padding-left: 5px;}
+.newloginArea	{text-align:right; padding:10px 10px 0 0; line-height:12px; margin-right:5%;}
+.newloginArea a:hover, .reset a:hover{color:#50b6bf}
+.header, .mainColumn{width:99%; background:#D8D8D8;}
+/*.header {margin-top:-3px;}*/
+/*.mainColumn{margin-top:-18px;padding-left:6px;}*/
+/*.mainMenu img{	border:0;margin-top: 15px;width:1px;height:18px}*/
+.mainMenu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #ffffff;
+    border-radius:10px 10px 10px 10px;
+}
+.mainMenu li { float: left; width: 24.94%; }
+.mainMenu li img { margin: auto; display: block; padding-top:15px; }
+.mainMenu li a {
+    display: block;
+    color: #50b6bf;
+    text-align: center;
+    padding: 16px 0 16px 0px;
+    text-decoration: none;
+}
+
+
+
+.mainMenu li a:hover { background-color: #50b6bf; color: white; }
+.mainMenu li.on a{	background:#50b6bf; color:#fff;}
+.mainLoginMenu li { float: left; width: 16.5%; }
+
+form, .homeBox h2,.homeBox2 h2 .boxInner h3, .boxInner p, .leftMenu, .leftMenu li {margin:0; padding:0;font-size:14px;}
+strong { font-size:14px;font-weight: bold; }
+
+.homeBox h2,.homeBox2 h2{margin-left:-8px;font-size:16.38px;}
+.homeBox2 h2{margin-bottom:10px}
+.homeBox,.homeBox2 {background:#fff; min-height:420px; margin-bottom:5px;background-color:#fff;border-radius: 10px;}
+.homeBox {width:32.5%;}
+.homeBox2{width:33%;}
+
+.boxInner a,.boxInner2{	display:block; background:#fff;	padding:0px 20px 5px 10px; color:#333;font-size:14px;}
+.boxInner a span.heading1,.boxInner2 {	font-size:14.5px; color:#333; font-weight:bold; padding-top:10px;  display:block 	}
+.boxInner2 label.link1    {	color:black; font-weight:bold; display:block; text-decoration:underline;margin-left:-10px;}
+.boxInner a label.SSID_len_32{	font-size:14px; font-weight:bold;  letter-spacing:1px;width:314px;   	}
+.brdr1  				{	border-top:1px solid #fff;border-left:20px solid #fff;font-size:16.38px}
+.brdr2 				{	border-top:1px solid #fff;}
+.brdr3 				{	margin-top:-15px;border-left:20px solid #fff;font-size:16.38px}
+
+/*
+.leftBar li a {
+    text-align: left;
+	padding-left: 16px;
+}
+.leftBar{padding-top: 2px;}
+.leftBar li {display: inline-block;        position: relative;    min-height:15px;	width:100%; border-bottom: 1px solid #D8D8D8;  }
+
+
+.homeMenuBox ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #ffffff;
+    border-radius:10px 10px 10px 10px; 
+}
+.homeMenuBox li { 
+    float: left; 
+    text-align: center;
+    padding: 16px;
+    text-decoration: none;    
+}
+
+first a:hover{	background:#50b6bf; color:#fff;border-radius:10px 0 0 10px;height:12px;width:100%;padding-top:25px;}*/
+
+
+.mainContent,.userContent,.bigContent{width:99.2%;margin:2px;padding: 0;list-style: none;background: #fff;border-radius:10px 10px 10px 10px;}
+.mainContent {height:800px;}
+.userContent {height:500px;}
+.bigContent  {height:1000px;}
+.maintitle {	width:90%; padding:1.5% 0 1% 5%}
+.content,.upgradeconetnt{	width:85%; padding:0 0 5% 5%; min-height:409px;  margin-bottom:5px; padding-right:10px;}
+.content label , .upgradeconetnt label{display: block;  padding-top:10px; color:#666;}
+.content label.subttl,.content label.subtt3,.content label.subttl4,.upgradeconetnt label.subtt3{display: inline-block;  padding:5px 0;   font-weight:normal; color:#666; }
+.content label.subttl {width:150px}
+.content label.subtt2,.upgradeconetnt label.subtt2{display: inline-block;  padding-right:10px; color:#666;}
+.content label.subtt3,.upgradeconetnt label.subtt3{width:250px}
+.content label.subttl4{width:100px}
+
+.content label.error, label.error 	{	font-size:12px; font-weight:normal; color:#f00	}
+.content label.title, .maintitle label.title {	 color:#000000; font-weight:bold; font-size:14px; margin-top:0;	}
+.maintitle label.title {font-size:16.38px;}
+.content input { border: 0px solid;border-bottom:1px solid #999;width:180px}
+.content select { border: 0px solid;border-bottom:1px solid #FF0000;width:200px; backgroundcolor:#FF0000;}
+.content input.text{ border: 0px solid;border-bottom:1px solid #999;width:200px}
+.content input.text2{ border: 0px solid;border-bottom:1px solid #999;width:150px}
+.content input.acsurltest{ border: 0px solid;border-bottom:1px solid #999;width:400px}
+
+.content .formBox	{	border-bottom:1px solid #adaeab; padding-bottom:10px; margin-bottom:5px;	}
+.content label a{display: inline-block; font-weight:bold; color:#666;font-size:14px}
+.content label a:hover{color:#50b6bf}
+
+.buttonStyle input, .buttonStyleB input, #LoginBox .popUpBox2 .buttonStyle input{border: 0px solid;height:35px;border-radius: 20px;background-color:#50b6bf;color:#fff;cursor:pointer;-webkit-appearance: none;box-shadow: none;appearance: none;-moz-appearance: none;}
+.buttonStyleB input{width:200px;}
+.buttonStyle input, #LoginBox .popUpBox2 .buttonStyle input{width:120px;/*margin-top:20px;*/}
+.buttonStyle input {margin-top:20px;}
+
+/* CUSTOM RADIO STYLES */
+input[type=radio]{  /* hide original inputs */  visibility: hidden;  position: absolute;}
+input[type=radio] + label{display: inline-block;position: relative;padding-left: 5px;margin-right: 15px;font-size: 14px;}
+input[type=radio] + label:before{  height:14px;  margin-right: 4px;  content: " ";  display:inline-block;  vertical-align: baseline; transition: 0.3s;bottom: 5px;border:1px solid #50b6bf;  border-radius:10px;  box-shadow: inset 0 -1px 3px #e4e4e4, inset 0 0 1px #222, inset 0 0 0 2px #50b6bf;  transition: 0.3s;}
+input[type=radio] + label:before{  border-radius:50%;  width:16px;}
+
+/* CHECKED */
+input[type=radio]:checked + label:before{  box-shadow: inset 0 -1px 3px #e4e4e4, inset 0 0 1px #222, inset 0 0 0 4px #50b6bf;}
+
+/* CUSTOM CHECKBOX STYLES */
+input[type=checkbox]{visibility: hidden;  position: absolute;}
+input[type=checkbox] + label{display: inline-block;position: relative;padding-left: 25px;margin-bottom:-3.5px;/*margin-right: 15px;*/font-size: 14px;}
+input[type=checkbox] + label:before{content: "";display: inline-block;width: 14px;height: 14px;margin-bottom:-3.5px;/*margin-right: 10px;*/position: absolute;left: 0;bottom: 5px;background-color: #50b6bf;box-shadow: inset 0px 2px 3px 0px rgba(0, 0, 0, .3), 0px 1px 0px 0px rgba(255, 255, 255, .8);	}
+input[type=checkbox] + label:before {	border-radius: 3px;}
+input[type=checkbox]:checked + label:before {content: "\2713";text-shadow: 1px 1px 1px rgba(0, 0, 0, .2);font-size: 14px;color: #fff;text-align: center;line-height: 15px;}
+
+input[type=password]::-ms-reveal {
+	display: none;
+    /* The cross can be hidden by setting the display attribute as "none" */
+}
+
+.dataTbl10 {font-size:14px;	border:1px solid #ebebe0; text-align: center;margin:15px 0;text-align: center;}
+.dataTbl10 th {	background:#ebebe0; font-size:14px;text-align: center;}
+.dataTbl10 th, .dataTbl10 td  {font-size:14px; text-align:center; padding: 5px 6px; border-left:2px solid #ebebe0 		}
+.dataTbl10 th.close, .dataTbl10 td.close, .dataTbl10 {	border-left:1px solid #e1e1d0;   	}
+.dataTbl10 .rowEven {	background:#ebebe0	}
+.file-box{ position:relative}
+.txt{ height:22px; border: 0;border-bottom:1px solid #999; width:300px;}
+
+.buttonStyleIn input,.buttonStyleIn2 input{width:120px;margin-bottom:5px;border: 2px solid #50b6bf;height:35px;border-radius: 20px;background-color:#fff;color:#50b6bf;cursor:pointer}
+.btnWtn {width:120px;border: 2px solid #50b6bf;height:35px;border-radius: 20px;background-color:#fff;color:#50b6bf;cursor:pointer}
+
+.buttonStyleIn2 input {margin-top:25px;}
+/*{ background-color:#fff; border:2px solid #50b6bf; border-radius:20px;height:24px; width:70px;}*/
+.file, .upload { position:absolute; top:0px; left:0px; filter:alpha(opacity:0);opacity: 0;font-size:14px; }
+.file{ height:24px; width:400px;}
+
+.upload-box{ position:relative;width:1px;display: inline-block;}
+.content input.upload {width:20px}
+/*.upload {width:5px;}*/
+
+.progressbar{     background-color:#ebebe0;     color:#222;     height:16px;     width:150px;     border:1px solid #bbb;     text-align:center;     position:relative; } 
+.progressbar .bar {     background-color:#ebebe0;     height:16px;     width:0;     position:absolute;     left:0;     top:0;     z-index:10;} 
+.progressbar .progressText {     height:16px;     position:absolute;     left:0;     top:0;     width:100%;    line-height:16px;     z-index:100; }
+
+.inlineDiv {padding-bottom:10px} 
+.inlineDiv2 {padding-bottom:5px} 
+/*special handing for Mantis #11830 */
+.inlineDiv3 {padding-bottom:5px; border: solid 1px white;} 
+.enterFile {cursor:pointer;display: inline-block;}
+.enterFile2 {display: inline-block;}
+
+.volumebar{ height:30px; width:90%; border-style: groove; border-radius:5px 5px 5px 5px; text-align:center; position:relative; } 
+.volumebar .bar { background-color:#6699FF; height:32px; width:0; border-style:none ; border-radius:0px 5px 5px 0px; position:absolute; left:-2; top:-2; z-index:10;} 
+.volumebar .volumebarText { height:30px; position:absolute; left:0; top:0; width:100%; line-height:30px; z-index:100; }
+
+/*input[type=radio]:disabled  + label:before {cursor: default;border: 2px solid #C8C8C8;box-shadow: inset 0 -1px 3px #e4e4e4, inset 0 0 1px #222, inset 0 0 0 4px #C8C8C8}*/
+input[type=radio]:disabled  + label:before {cursor: default;border: 2px solid #C0C0C0;background-color:#C0C0C0}
+input[type=radio]:not([disabled]) +label {  cursor:pointer;}
+input[type=checkbox]:disabled  + label:before {cursor: default;border: 2px solid #C8C8C8;background-color: #C8C8C8}
+input[type=checkbox]:not([disabled]) +label {  cursor:pointer;}

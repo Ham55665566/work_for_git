@@ -1,0 +1,232 @@
+/* -------------------------------- 
+
+Primary style
+
+-------------------------------- */
+*, *::after, *::before {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 55%;
+}
+
+body  {
+	margin: 0px; 
+	font-family:helvetica_neuelight, Meiryo, Arial, Tahoma, sans-serif; 
+	background:#D8D8D8;
+	border-radius:10px 10px 10px 10px;
+}
+
+a {
+  /*color: #a0f6aa;*/
+  text-decoration: none;
+}
+
+input {
+  font-family: helvetica_neuelight, Meiryo, Arial, Tahoma, sans-serif;
+  font-size: 1.5rem;
+}
+
+ul, li, form, label {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
+ol, ul {
+	list-style: none;
+}
+
+/* -------------------------------- 
+
+Main Components 
+
+-------------------------------- */
+.cd-accordion-menu {
+	padding-right:5px;
+	padding-top:0.3em;
+}
+.cd-accordion-menu ul {
+  /* by default hide all sub menus */  
+  display: none;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #ffffff;	
+}
+.cd-accordion-menu li {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  min-height:15px;
+  /*display: inline-block;*/
+  position: relative; 
+}
+.cd-accordion-menu input[type=checkbox] {
+  /* hide native checkbox */
+  position: absolute;
+  opacity: 0;
+}
+.cd-accordion-menu label, .cd-accordion-menu a {
+  position: relative;
+  display: block;
+  padding: 12px 18px 12px 18px;
+  background: #fff;
+  box-shadow: inset 0 -1px #D8D8D8;
+  color: #50b6bf;
+  font-size: 1.6rem;
+  /*border-radius:10px 10px 0px 0px;*/
+}
+
+.toggle-menu-first label  {
+  border-radius:10px 10px 0px 0px;
+}
+.toggle-menu-last-on-uncheck ul, .toggle-menu-last-on ul/*, .toggle-menu-last label*/  {
+  border-radius:0px 0px 10px 10px;
+}
+.toggle-menu-last label {
+  border-radius:0px 0px 10px 10px;
+}
+.toggle-menu-first-on label  {
+	border-radius:10px 10px 0px 0px;
+	background:#50b6bf; 
+	color:#fff;	
+}
+
+.toggle-menu-last-on-uncheck label {
+	background:#50b6bf; 
+	color:#fff;	   
+	border-radius:0px 0px 10px 10px; 
+}
+.toggle-menu-last-on label  {
+	background:#50b6bf; 
+	color:#fff;	  
+	border-radius:0px 0px 0px 0px;
+}
+
+.toggle-menu-on label  {
+  background:#50b6bf;   
+  color:#fff;
+}
+.cd-accordion-menu label:hover, .cd-accordion-menu a:hover {
+  background: #50b6bf;
+  color:#fff;
+}
+
+.cd-accordion-menu label {
+  cursor: pointer;
+}
+
+.cd-accordion-menu input[type=checkbox]:checked + label + ul,
+.cd-accordion-menu input[type=checkbox]:checked + label:nth-of-type(n) + ul {
+  /* use label:nth-of-type(n) to fix a bug on safari (<= 8.0.8) with multiple adjacent-sibling selectors*/
+  /* show children when item is checked */
+  display: block;
+}
+.cd-accordion-menu ul label,
+.cd-accordion-menu ul a {
+  background: #ebebe0; /* toggle color*/
+  /*box-shadow: inset 0 -1px #D8D8D8;*/
+  padding-left: 50px;
+}
+.cd-accordion-menu ul label:hover
+.cd-accordion-menu ul a:hover {
+  background: #50b6bf;
+}
+.cd-accordion-menu > li:last-of-type > label,
+.cd-accordion-menu > li:last-of-type > a,
+.cd-accordion-menu > li > ul > li:last-of-type label,
+.cd-accordion-menu > li > ul > li:last-of-type a {
+  /*box-shadow: none;*/
+}
+
+.firstmenu a 
+{
+	border-radius:10px 10px 0px 0px;
+}
+
+.firstmenu-on a  {
+	border-radius:10px 10px 0px 0px;
+	background:#50b6bf; 
+	color:#fff;	
+}
+
+.lastmenu a {
+	border-radius:0px 0px 10px 10px;
+}
+
+.lastmenu-on a {
+	border-radius:0px 0px 10px 10px;
+	background:#50b6bf; 
+	color:#fff;	
+}
+
+.cd-accordion-menu li.firstmenu_on a {	
+	background:#50b6bf; 
+	color:#fff;
+	border-radius:10px 10px 0 0;
+}
+.cd-accordion-menu li.lastmenu_on a {	
+	background:#50b6bf; color:#fff;
+	border-radius:0 0 10px 10px;
+}
+.cd-accordion-menu li.middlemenu_on a {	
+	background:#50b6bf; 
+	color:#fff;
+}
+
+/*
+.cd-accordion-menu label {
+	background:#50b6bf; 
+	color:#fff;	
+}
+*/
+
+.toggle-menu {
+  border-width: 0 0 1px;
+}
+.toggle-menu{
+  position: relative;
+  display: block;
+}
+.toggle-menu{
+  padding: 1em 1.5em;
+}
+.toggle-menu .drop-icon {
+  position: absolute;
+  right: 1.5em;
+  top: 1.25em;
+}
+.toggle-menu span.drop-icon {
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+  text-align: center;
+  background-color: rgba(0, 0, 0, .125);
+  text-shadow: 0 0 0 transparent;
+  /*color: rgba(255, 255, 255, .75);*/
+}
+
+.cd-accordion-menu span.drop-icon {	
+	line-height: 1;
+}
+
+/*testing*/
+span.drop-icon {
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+  text-align: center;
+  background-color: rgba(0, 0, 0, .125);
+  text-shadow: 0 0 0 transparent;
+  /*color: rgba(255, 255, 255, .75);*/
+  position: absolute;
+  right: 1.5em;
+  top: 1.25em;
+}

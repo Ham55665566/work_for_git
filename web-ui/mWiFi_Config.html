@@ -1,0 +1,766 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Basic</title>
+<meta http-equiv="Content-Type" content="text/html; charset=big5">
+<link href="/css/stylesheet.css" rel="stylesheet" type="text/css" />
+<script language="JavaScript" src="/js/validate.js"></script>
+<script language="JavaScript" src="/js/common.js"></script>
+<script language="JavaScript" src="/js/message.js"></script>
+<script language="JavaScript" src="/js/swipe.js"></script>
+<script language="JavaScript">
+var AP_CHMODE = "~*AP_CHMODE~";
+var cu = "~*cu~";
+var setting_enable_lock = "~~WIFI_BASIC_ENABLE_LOCK:0~";
+var setting_SHOWON_SCREEN_LOC_lock = "~~WIFI_BASIC_SHOWON_SCREEN_LOCK:0~";
+var setting_MULTI_SSID_lock ="~~WIFI_BASIC_MULTI_SSID_LOCK:0~";
+var setting_MULTI_SSID_CM_lock ="~~WIFI_BASIC_MULTI_SSID_CM_LOCK:0~";
+var setting_MAX_CLIENTS_lock ="~~WIFI_BASIC_MAX_CLIENTS_LOCK:0~";
+var setting_SSID_A_lock ="~~WIFI_SSID_A_LOCK:0~";
+var setting_SSID_B_lock ="~~WIFI_SSID_B_LOCK:0~";
+var setting_SSID_A_SEC_lock ="~~WIFI_SSID_A_SEC_LOCK:0~";
+var setting_SSID_B_SEC_lock ="~~WIFI_SSID_B_SEC_LOCK:0~";
+var setting_SSID_A_PW_lock ="~~WIFI_SSID_A_PW_LOCK:0~";
+var setting_SSID_B_PW_lock ="~~WIFI_SSID_B_PW_LOCK:0~";
+var setting_SSID_A_SS_lock ="~~WIFI_SSID_A_SS_LOCK:0~";
+var setting_SSID_B_SS_lock ="~~WIFI_SSID_B_SS_LOCK:0~";
+var setting_SSID_A_PS_lock ="~~WIFI_SSID_A_PS_LOCK:0~";
+var setting_SSID_B_PS_lock ="~~WIFI_SSID_B_PS_LOCK:0~";
+
+var xhr_wifi_apply = null;
+
+function wifi_query_callback()
+{	
+    if( xhr_wifi_apply.readyState == 4 )
+    {	  
+        if( xhr_wifi_apply.status == 200 )
+        {
+            var response_text = xhr_wifi_apply.responseText;
+
+            if( response_text != null && response_text.length > 0 )
+            {
+                response_text = escape_nl( response_text );
+                var json_obj = eval("("+response_text+")");
+				
+				if(json_obj.text == "0")
+				{
+					setTimeout("wifi_query_request();", 100);	
+				}
+				else
+				{
+					document.getElementById("WiFiSetting").style.display="block";
+					document.getElementById("divPrimaryNetworkRestarting").style.display="none";					
+				}
+            }					
+        }
+    }
+}
+
+function wifi_query_request() 
+{   
+    if( xhr_wifi_apply == null )
+    {
+        xhr_wifi_apply = createXHR();
+    }
+
+    if (xhr_wifi_apply)
+    {
+        xhr_wifi_apply.open("GET", "/cgi-bin/cm/mWiFi_Config_InProgressAjax.html");
+        xhr_wifi_apply.onreadystatechange = wifi_query_callback;
+        xhr_wifi_apply.send(null);
+    }
+}
+
+function ResetWifiDefault()
+{
+	if ( confirm ("To reset Wi-Fi settings to factory default settings will lose current Wi-Fi settings and cause Wi-Fi connection to be disconnected in order to make "+
+			"Wi-Fi settings effective. \n\nAre you sure to reset current Wi-Fi settings to default settings now?") == false)
+	{
+		return false;	
+	}
+	
+	document.getElementById("WiFiSetting").style.display="none";
+	document.getElementById("divPrimaryNetworkRestarting").style.display="block";
+	document.getElementById("ResetWiFiDefault").value = 1;
+	
+	wifi_query_request();	
+	document.forms["myForm"].submit();
+}
+
+function validate_all()
+{
+	if(document.getElementById("AP_ENABLE").checked == true)
+	{
+		var Max_Cient = document.getElementById("Max_Cient");
+		if( checkEmpty( Max_Cient ) || isInteger(Max_Cient.value) == false || parseInt(Max_Cient.value) < 1 || parseInt(Max_Cient.value) > 10)
+		{
+			document.getElementById("lPassErrorMesPN2").innerHTML = "Max Number of Connected Clients must be between 1 and 10.";
+			document.getElementById("lPassErrorMesPN2").style.display = "block";	
+			return false;
+		}		
+	
+		var AP_SSID_A = document.getElementById("AP_SSID_A");
+		if( checkEmpty( AP_SSID_A ) || AP_SSID_A.value.length > 32)
+		{
+			document.getElementById("lPassErrorMesPN2").innerHTML = arrayMsg[57];
+			document.getElementById("lPassErrorMesPN2").style.display = "block";	
+			return false;
+		}
+		
+		var AP_SECMODE_A = document.getElementById("AP_SECMODE_A");
+		var secMode_index = AP_SECMODE_A.selectedIndex;
+		
+		if(AP_SECMODE_A.options[secMode_index].value == "OPEN")
+		{
+			if ( confirm ("Wireless security for SSID A is disabled and all wireless client can connect to this device. \n\nAre you sure you want to do this?") == false)
+			{
+				//document.getElementById("content").src = "/cgi-bin/en-jio/cgi-bin/en-jio/mWiFi_Config.html";
+				return false;	
+			}
+		}
+		else if(AP_SECMODE_A.options[secMode_index].value == "WEP")
+		{
+			var key = document.getElementById("WEP_Key_A").value;
+			if(key.length != 5 && key.length != 10 && key.length != 13 && key.length != 26)
+			{
+				document.getElementById("lPassErrorMesPN2").innerHTML = "The length of WEP KEY must be 5, 10, 13 26.";
+				document.getElementById("lPassErrorMesPN2").style.display = "block";				
+				return false;
+			}
+			
+			if(key.length == 10 || key.length == 26)
+			{
+				if(!isHexStr(key))
+				{
+					document.getElementById("lPassErrorMesPN2").innerHTML = "The WEP KEY must be hexadecimal string.";
+					document.getElementById("lPassErrorMesPN2").style.display = "block";			
+					return false;
+				}
+			}
+			document.getElementById("AP_key_A").value = key;				
+		}
+		else if(AP_SECMODE_A.options[secMode_index].value != "OPEN")
+		{
+			var key = document.getElementById("WPA_PSK_KEY_A").value;			
+			if(key.length < 8)
+			{
+				//alert("The length of password must be over 7.");
+				document.getElementById("lPassErrorMesPN2").innerHTML = "The length of password must be over 7.";
+				document.getElementById("lPassErrorMesPN2").style.display = "block";				
+				return false;
+			}
+			else if(key.length == 64)
+			{
+				if(!isHexStr(key))
+				{
+					//alert("The length of password is 64 and the key must be hexadecimal string.");
+					document.getElementById("lPassErrorMesPN2").innerHTML = "The length of password is 64 and the key must be hexadecimal string.";
+					document.getElementById("lPassErrorMesPN2").style.display = "block";			
+					return false;
+				}		
+			}
+			else if(key.length > 64)
+			{
+				//alert("The maximum length of password is 64.");
+				document.getElementById("lPassErrorMesPN2").innerHTML = "The maximum length of password is 64.";	
+				document.getElementById("lPassErrorMesPN2").style.display = "block";
+				return false;	
+			}
+			document.getElementById("AP_key_A").value = key;
+		}
+		
+		if(document.getElementById("AP_MULTISSID_ENABLE").checked == true)
+		{
+			var AP_SSID_B = document.getElementById("AP_SSID_B");
+			if( checkEmpty( AP_SSID_B ) || AP_SSID_B.value.length > 32)
+			{
+				document.getElementById("lPassErrorMesPN2").innerHTML = arrayMsg[57];
+				document.getElementById("lPassErrorMesPN2").style.display = "block";	
+				return false;
+			}
+			
+			var AP_SECMODE_B = document.getElementById("AP_SECMODE_B");
+			var secModeB_index = AP_SECMODE_B.selectedIndex;
+			
+			if(AP_SECMODE_B.options[secModeB_index].value == "OPEN")
+			{
+				if ( confirm ("Wireless security for SSID B is disabled and all wireless client can connect to this device. \n\nAre you sure you want to do this?") == false)
+				{
+					//document.getElementById("content").src = "/cgi-bin/en-jio/cgi-bin/en-jio/mWiFi_Config.html";
+					return false;	
+				}
+			}
+			else if(AP_SECMODE_B.options[secModeB_index].value == "WEP")
+			{
+				var key = document.getElementById("WEP_Key_B").value;
+				if(key.length != 5 && key.length != 10 && key.length != 13 && key.length != 26)
+				{
+					document.getElementById("lPassErrorMesPN2").innerHTML = "The length of WEP KEY must be 5, 10, 13 26.";
+					document.getElementById("lPassErrorMesPN2").style.display = "block";				
+					return false;
+				}
+				
+				if(key.length == 10 || key.length == 26)
+				{
+					if(!isHexStr(key))
+					{
+						document.getElementById("lPassErrorMesPN2").innerHTML = "The WEP KEY must be hexadecimal string.";
+						document.getElementById("lPassErrorMesPN2").style.display = "block";			
+						return false;
+					}
+				}
+                document.getElementById("AP_key_B").value = key;					
+			}
+			else if(AP_SECMODE_B.options[secModeB_index].value != "OPEN")
+			{
+				var key = document.getElementById("WPA_PSK_KEY_B").value;
+				
+				if(key.length < 8)
+				{
+					//alert("The length of password must be over 7.");
+					document.getElementById("lPassErrorMesPN2").innerHTML = "The length of password must be over 7.";	
+					document.getElementById("lPassErrorMesPN2").style.display = "block";				
+					return false;
+				}
+				else if(key.length == 64)
+				{
+					if(!isHexStr(key))
+					{
+						//alert("The length of password is 64 and the key must be hexadecimal string.");
+						document.getElementById("lPassErrorMesPN2").innerHTML = "The length of password is 64 and the key must be hexadecimal string.";
+						document.getElementById("lPassErrorMesPN2").style.display = "block";			
+						return false;
+					}		
+				}
+				else if(key.length > 64)
+				{
+					//alert("The maximum length of password is 64.");
+					document.getElementById("lPassErrorMesPN2").innerHTML = "The maximum length of password is 64.";	
+					document.getElementById("lPassErrorMesPN2").style.display = "block";
+					return false;	
+				}
+				document.getElementById("AP_key_B").value = key;		
+			}	
+		}
+	}
+
+	
+	if ( confirm ("Changing Wi-Fi settings will cause Wi-Fi connection to be disconnected in order to make "+
+			"Wi-Fi settings effective. \n\nAre you sure to change Wi-Fi settings now?") == false)
+	{
+		return false;	
+	}
+	document.getElementById("WiFiSetting").style.display="none";
+	document.getElementById("divPrimaryNetworkRestarting").style.display="block";
+	document.getElementById("ResetWiFiDefault").value = 0;
+	wifi_query_request();
+	document.getElementById("AP_ENABLE_VALUE").value = 0;
+	document.getElementById("AP_MULTISSID_ENABLE_VALUE").value =0;
+	document.getElementById("AP_ISOLATED_VALUE").value=0;
+	document.getElementById("displayTouch_VALUE").value = 0;
+	document.getElementById("AP_Separator_A_VALUE").value = 0;
+	document.getElementById("AP_HIDE_B_VALUE").value = 0;
+	document.getElementById("AP_Separator_B_VALUE").value = 0;
+	document.getElementById("AP_HIDE_A_VALUE").value = 0;
+	
+	if(document.getElementById("AP_ENABLE").checked)
+		document.getElementById("AP_ENABLE_VALUE").value=1;
+	
+	if(document.getElementById("AP_MULTISSID_ENABLE").checked)
+		document.getElementById("AP_MULTISSID_ENABLE_VALUE").value = 1;		
+	
+	if(document.getElementById("AP_ISOLATED").checked)
+		document.getElementById("AP_ISOLATED_VALUE").value = 1;
+		
+	if(document.getElementById("displayTouch").checked)
+		document.getElementById("displayTouch_VALUE").value=1;
+	
+	if(document.getElementById("AP_HIDE_A_DISABLED").checked)
+		document.getElementById("AP_HIDE_A_VALUE").value = 1;	
+	
+	if(document.getElementById("AP_Separator_A").checked)
+		document.getElementById("AP_Separator_A_VALUE").value = 1;
+	
+	if(document.getElementById("AP_HIDE_B_DISABLED").checked)
+		document.getElementById("AP_HIDE_B_VALUE").value = 1;
+	
+	if(document.getElementById("AP_Separator_B").checked)
+		document.getElementById("AP_Separator_B_VALUE").value = 1;				
+		
+	document.getElementById("Max_Cient_VALUE").value = document.getElementById("Max_Cient").value;
+	document.getElementById("AP_SSID_A_VALUE").value = document.getElementById("AP_SSID_A").value;
+	document.getElementById("AP_SECMODE_A_VALUE").value = document.getElementById("AP_SECMODE_A").value;
+	document.getElementById("WEP_Key_A_VALUE").value = document.getElementById("WEP_Key_A").value;
+	document.getElementById("WPA_PSK_KEY_A_VALUE").value = document.getElementById("WPA_PSK_KEY_A").value;
+	document.getElementById("AP_SSID_B_VALUE").value = document.getElementById("AP_SSID_B").value;
+	document.getElementById("AP_SECMODE_B_VALUE").value = document.getElementById("AP_SECMODE_B").value;
+	document.getElementById("WEP_Key_B_VALUE").value = document.getElementById("WEP_Key_B").value;
+	document.getElementById("WPA_PSK_KEY_B_VALUE").value = document.getElementById("WPA_PSK_KEY_B").value;
+	document.forms["myForm"].submit();
+}
+
+function hiddenPassword(name, key_name)
+{
+  var password_text = document.createElement('input');
+  if(document.getElementById(name).checked)
+   password_text.type = 'password'
+  else
+   password_text.type = 'text'
+  var text = document.getElementById(key_name);
+  password_text.id = text.id;
+  password_text.value = text.value;
+  password_text.name = text.name;
+  password_text.setAttribute( "autocomplete", "off" );
+  /*password_text.className ="textfield";*/
+  password_text.maxLength = "64";
+  text.parentNode.replaceChild(password_text, text);
+  if((setting_SSID_A_PW_lock == "1") && name.indexOf("_A") > 0)
+  {
+    document.getElementById(password_text.id).disabled = true;
+  } 
+  
+  if((setting_SSID_B_PW_lock == "1") && name.indexOf("_B") > 0)
+  {
+    document.getElementById(password_text.id).disabled = true;
+  } 
+}
+
+function change_authentication(ssid, secmode)  //secmode = html input object ID
+{	
+	var AP_SECMODE = document.getElementById(secmode);
+	var wep_field = "lWpaEncryption_WEP";
+	var wpa_field = "lWpaEncryption";
+	if(ssid == 1)
+	{
+		wep_field = wep_field+"_A";
+		wpa_field = wpa_field+"_A";
+	}
+	else if(ssid == 2)	
+	{
+		wep_field = wep_field+"_B";
+		wpa_field = wpa_field+"_B";
+	}	
+	
+	if(AP_SECMODE.value != "OPEN")
+	{
+		if(AP_SECMODE.value == "WEP")
+		{
+			document.getElementById(wep_field).style.display = "block";
+			document.getElementById(wpa_field).style.display = "none";
+		}
+		else
+		{
+			document.getElementById(wep_field).style.display = "none";
+			document.getElementById(wpa_field).style.display = "block";
+		}
+	}
+	else
+	{
+		document.getElementById(wep_field).style.display = "none";
+		document.getElementById(wpa_field).style.display = "none";
+	}
+	
+	return true;
+}
+
+function EnabledWiFi()
+{
+	if(document.getElementById("AP_ENABLE").checked == false)
+		document.getElementById("mainWiFiFrame").style.display = "none";
+	else
+		document.getElementById("mainWiFiFrame").style.display = "block";	
+}
+
+function changeMultiSSID()
+{
+	if(document.getElementById("AP_MULTISSID_ENABLE").checked == false)
+	{
+		document.getElementById("ap_isolation").style.display = "none";
+		var AP_Interface = document.getElementById("AP_Interface");	
+		AP_Interface.selectedIndex = 0;
+		selectInterface();
+		AP_Interface.disabled = true;
+		//var height = document.getElementById("mainContent").style.height;
+		//document.getElementById("mainContent").style.height = height-"20px";
+	}
+	else
+	{
+		document.getElementById("ap_isolation").style.display = "block";	
+		document.getElementById("AP_Interface").disabled = false;
+		//var height = document.getElementById("mainContent").style.height;
+		//document.getElementById("mainContent").style.height = height+"20px";
+	}
+}
+
+function selectInterface()
+{
+	var AP_Interface = document.getElementById("AP_Interface");	
+	var AP_Interface_value = AP_Interface[AP_Interface.selectedIndex].value;
+	if(AP_Interface_value == "0")//ssid a
+	{	
+		document.getElementById("mainContent").style.height = "750px";
+		document.getElementById("SSID_B").style.display = "none";
+		document.getElementById("SSID_A").style.display = "block";
+		document.getElementById("ssida_qrCode").style.display = "block";
+		document.getElementById("ssidb_qrCode").style.display = "none";
+	}
+	else //ssid b
+	{
+		document.getElementById("mainContent").style.height = "790px";
+		document.getElementById("SSID_A").style.display = "none";
+		document.getElementById("SSID_B").style.display  = "block";
+		document.getElementById("ssida_qrCode").style.display = "none";
+		document.getElementById("ssidb_qrCode").style.display = "block";
+	}
+}
+
+function update_content()
+{
+	var wifi_enable = "~*AP_ENABLE:0~";
+	var wifi_multissid = "~*AP_MultiSSID:0~";
+	var wifi_isolated = "~*AP_Isolated:0~";	
+	
+	var wifi_ssida_secmode = "~*AP_SECMODE_A~";	
+	var wifi_ssidb_secmode = "~*AP_SECMODE_B~";
+	var wifi_ssida_cypher = "~*AP_CYPHER_A~";	
+	var wifi_ssidb_cypher = "~*AP_CYPHER_B~";
+	
+	if(wifi_enable == "0")
+	{
+		document.getElementById("mainWiFiFrame").style.display = "none";
+		//document.getElementById("AP_ENABLE").checked = false;
+	}
+	else
+	{
+		document.getElementById("mainWiFiFrame").style.display = "block";
+		//document.getElementById("AP_ENABLE").checked = true;
+	}
+	
+	if(wifi_multissid == "0")
+	{
+		document.getElementById("ap_isolation").style.display = "none";
+		document.getElementById("AP_MULTISSID_ENABLE").checked = false;
+		document.getElementById("AP_Interface").disabled = true;
+	}
+	else
+	{
+		document.getElementById("ap_isolation").style.display = "block";
+		document.getElementById("AP_MULTISSID_ENABLE").checked = true;
+	}
+	
+	if(wifi_isolated == "0")
+		document.getElementById("AP_Isolated_Disable").checked = true;
+	else
+		document.getElementById("AP_ISOLATED").checked = true;
+	
+	//display ssid a
+	if(wifi_ssida_secmode == "OPEN")
+	{
+		document.getElementById('lWpaEncryption_A').style.display = "none";
+		if(wifi_ssida_cypher == "WEP")			
+			document.getElementById('lWpaEncryption_WEP_A').style.display = "block";	
+		else
+			document.getElementById('lWpaEncryption_WEP_A').style.display = "none";
+	}
+	
+	//display ssid b
+	if(wifi_ssidb_secmode == "OPEN")
+	{
+		document.getElementById('lWpaEncryption_B').style.display = "none";
+		if(wifi_ssidb_cypher == "WEP")
+			document.getElementById('lWpaEncryption_WEP_B').style.display = "block";
+		else
+			document.getElementById('lWpaEncryption_WEP_B').style.display = "none";
+	}	
+	
+	/*
+	var msg = "~*PRE_MSG~";	
+	if(msg != "")
+	{
+		document.getElementById("lPassErrorMesPN2").innerHTML = arrayMsg[msg];		
+		document.getElementById("lPassErrorMesPN2").style.display = "block";	
+	}	
+	
+	if(screen.width < 424)
+	{	    
+		var br1 = document.createElement("br");
+		var br2 = document.createElement("br");
+		var br3 = document.createElement("br");
+		var wifiStatus = document.getElementById("wifiStatus");
+		var wifissid = document.getElementById("wifissid");
+		var wifiHiden = document.getElementById("wifiHiden");
+		wifiStatus.appendChild(br1);
+		wifissid.appendChild(br2);
+		wifiHiden.appendChild(br3);
+	}
+	*/
+	leftSwipe("mainContent", "mangt", "", cu, null);
+	
+	if(setting_enable_lock == "1")
+	{
+		document.getElementById("AP_ENABLE").disabled = true;
+		document.getElementById("AP_ENABLE_DISABLED").disabled = true;
+	}
+	
+	if(setting_MULTI_SSID_lock == "1")
+	{
+		document.getElementById("AP_MULTISSID_ENABLE").disabled = true;
+		document.getElementById("AP_MULTISSID_DISABLED").disabled = true;
+	}
+	
+	if(setting_SHOWON_SCREEN_LOC_lock == "1")
+	{
+		document.getElementById("displayTouch").disabled = true;
+	}	
+	
+	if(setting_MULTI_SSID_CM_lock == "1")
+	{
+		document.getElementById("AP_ISOLATED").disabled = true;
+		document.getElementById("AP_Isolated_Disable").disabled = true;
+	}	
+	
+	if(setting_MAX_CLIENTS_lock == "1")
+	{
+		document.getElementById("Max_Cient").disabled = true;
+	}	
+	
+	if(setting_SSID_A_lock == "1")
+	{
+		document.getElementById("AP_SSID_A").disabled = true;
+	}	
+	
+	if(setting_SSID_B_lock == "1")
+	{
+		document.getElementById("AP_SSID_B").disabled = true;
+	}	
+
+	if(setting_SSID_A_SEC_lock == "1")
+	{
+		document.getElementById("AP_SECMODE_A").disabled = true;
+	}	
+	
+	if(setting_SSID_B_SEC_lock == "1")
+	{
+		document.getElementById("AP_SECMODE_B").disabled = true;
+	}	
+
+	if(setting_SSID_A_PW_lock == "1")
+	{
+		document.getElementById("WEP_Key_A").disabled = true;
+		document.getElementById("WPA_PSK_KEY_A").disabled = true;
+	}
+	
+	if(setting_SSID_B_PW_lock == "1")
+	{
+		document.getElementById("WEP_Key_B").disabled = true;
+		document.getElementById("WPA_PSK_KEY_B").disabled = true;
+	}
+	
+	if(setting_SSID_A_SS_lock == "1")
+	{
+		document.getElementById("AP_HIDE_A").disabled = true;
+		document.getElementById("AP_HIDE_A_DISABLED").disabled = true;
+	}
+	
+	if(setting_SSID_B_SS_lock == "1")
+	{
+		document.getElementById("AP_HIDE_B").disabled = true;
+		document.getElementById("AP_HIDE_B_DISABLED").disabled = true;
+	}
+	
+	if(setting_SSID_A_PS_lock == "1")
+	{
+		document.getElementById("AP_Separator_A").disabled = true;
+		document.getElementById("AP_Separator_A_Disable").disabled = true;
+	}
+	
+	if(setting_SSID_B_PS_lock == "1")
+	{
+		document.getElementById("AP_Separator_B").disabled = true;
+		document.getElementById("AP_Separator_B_Disable").disabled = true;
+	}	
+}
+</script>
+</head>
+
+<body onLoad="update_content();" >
+<form name="myForm" method="post" action="/cgi-bin/cm/mWiFi_Config_Apply.html">
+<input type="hidden" name="RequestVerifyToken" value="~*token~">
+<input type="hidden" name="ResetWiFiDefault" id="ResetWiFiDefault">	
+<input type="hidden" name="AP_key_A" id="AP_key_A">	
+<input type="hidden" name="AP_key_B" id="AP_key_B">	
+<input type="hidden" name="AP_ENABLE" id="AP_ENABLE_VALUE">
+<input type="hidden" name="AP_MULTISSID_ENABLE" id="AP_MULTISSID_ENABLE_VALUE">
+<input type="hidden" name="AP_ISOLATED" id="AP_ISOLATED_VALUE">
+<input type="hidden" name="Max_Cient" id="Max_Cient_VALUE">
+<input type="hidden" name="displayTouch" id="displayTouch_VALUE">
+<input type="hidden" name="AP_SSID_A" id="AP_SSID_A_VALUE">
+<input type="hidden" name="AP_SECMODE_A" id="AP_SECMODE_A_VALUE">
+<input type="hidden" name="WEP_Key_A" id="WEP_Key_A_VALUE">
+<input type="hidden" name="WPA_PSK_KEY_A" id="WPA_PSK_KEY_A_VALUE">
+<input type="hidden" name="AP_HIDE_A" id="AP_HIDE_A_VALUE">
+<input type="hidden" name="AP_Separator_A" id="AP_Separator_A_VALUE">
+<input type="hidden" name="AP_SSID_B" id="AP_SSID_B_VALUE">
+<input type="hidden" name="AP_SECMODE_B" id="AP_SECMODE_B_VALUE">
+<input type="hidden" name="WEP_Key_B" id="WEP_Key_B_VALUE">
+<input type="hidden" name="WPA_PSK_KEY_B" id="WPA_PSK_KEY_B_VALUE">
+<input type="hidden" name="AP_HIDE_B" id="AP_HIDE_B_VALUE">
+<input type="hidden" name="AP_Separator_B" id="AP_Separator_B_VALUE">
+
+<div class="mainContent" id="mainContent" style="height:750px">
+	<div class="maintitle">
+		<label id="title" class="title">Basic</label>
+	</div>
+	<hr color="#D8D8D8" size="1px" width="100%"> </hr>
+	<div id="Content" class="content">	
+	<label>If you change Wi-Fi setting, you also need to change setting of Wi-Fi clients.</label>
+	  <br style="clear:both">	
+	<div id="WiFiSetting">
+		<div id="nwRadiovisi" class="inlineDiv" onclick="EnabledWiFi()">
+		<label class="subtt2" style="width:180px">Wi-Fi:</label>
+		<input type="radio" name= "AP_ENABLE_ID" id="AP_ENABLE" value="1" ~cAP_ENABLE:1:1~><label for="AP_ENABLE">Enabled</label>
+		<input type="radio" name= "AP_ENABLE_ID" id="AP_ENABLE_DISABLED" value="0" ~cAP_ENABLE:0:0~><label for="AP_ENABLE_DISABLED">Disabled</label>
+		</div>
+		<div id="mainWiFiFrame" style="display: none">
+		<div  id="lWiFiMultiSSID" class="inlineDiv" onclick="changeMultiSSID()">
+		<label class="subtt2" style="width:180px">Multi-SSID:</label>
+		<input type="radio" name= "AP_MULTISSID_ID" id="AP_MULTISSID_ENABLE" value="1" ~cAP_MultiSSID:1:0~><label for="AP_MULTISSID_ENABLE">Enabled</label>
+		<input type="radio" name= "AP_MULTISSID_ID" id="AP_MULTISSID_DISABLED"  value="0" ~cAP_MultiSSID:0:0~><label for="AP_MULTISSID_DISABLED">Disabled</label>
+		</div>
+		<div class="inlineDiv" id="ap_isolation">
+			<label class="subtt2" style="width:180px">Multi-SSID AP Isolation:</label>
+			<input type="radio" name= "AP_ISOLATED_ID" id="AP_ISOLATED" value="1"><label for="AP_ISOLATED">Enabled</label>
+			<input type="radio" name= "AP_ISOLATED_ID" id="AP_Isolated_Disable" value="0" ><label for="AP_Isolated_Disable">Disabled</label>				
+		</div>				
+		<div  id="LWiFiMaxClient" class="inlineDiv">
+		<label class="subtt2">Max Number of Connected Clients(1-10):</label>
+		<input size="1" id="Max_Cient" type="text" value="~*Max_Cient~" style="width:50px">	
+		</div>
+		<div class="inlineDiv">			
+		<input id="displayTouch" type="checkbox" ~cdisableConnGuide:1:1~>
+		<label for="displayTouch" class="subtt2">Show SSID and security key on Touch Screen</label>
+		</div>
+		<br>
+		<img src="/images/wifiA.jpg" id="ssida_qrCode" style="width:80px;height:80px;margin-left:90%;margin-top:-20px">
+		<img src="/images/wifiB.jpg" id="ssidb_qrCode" style="width:80px;height:80px;margin-left:90%;margin-top:-20px;display: none">
+		<div id="ssidSettins" style="margin-top:-60px">
+		<div class="inlineDiv">	
+		<label class="subtt2" style="width:180px">Interface:</label>
+		<select name="AP_Interface" id="AP_Interface" onChange="selectInterface()">
+		<option value="0">SSID A</option>
+		<option value="1">SSID B</option>			
+		</select>
+		</div>
+		<div id="SSID_A">
+			<div id="nwSSID" class="inlineDiv">
+			<label class="subtt2" style="width:180px">SSID:</label>
+			<input id="AP_SSID_A" maxlength="32" style="padding-left:5px;" type="text" value='~*AP_SSID_A~'>
+			</div>
+			
+			<div id="nwSecurity" class="inlineDiv">	
+			<label id="lWireSecurity"  class="subtt2" style="width:180px">Security:</label>
+			<select id="AP_SECMODE_A" onChange="change_authentication(1, 'AP_SECMODE_A');;">
+			<option value="OPEN" ~sAP_CYPHER_A:NONE:NONE~>Open</option>
+			<option value="WEP123" ~sAP_CYPHER_A:WEP:AES/TKIP~>WEP</option>				
+			<option value="WPA2-PSK" ~sAP_CYPHER_A:AES:AES/TKIP~>WPA2-PSK (AES)</option>
+			<option value="WPA-PSK/WPA2-PSK" ~sAP_CYPHER_A:AES/TKIP:AES/TKIP~>WPA/WPA2-PSK (AES/TKIP)</option>
+			</select>
+			</div>
+
+			<div id="lWpaEncryption_WEP_A" class="inlineDiv" style="display: none">		
+			<label class="subtt2" style="width:180px">WEP Key:</label>
+			<input maxlength="64" id="WEP_Key_A" type="password" value="~*WEP_Key_A~">				
+			<input name="hidden_WEP_A" id="hidden_WEP_A" type="checkbox" onchange="hiddenPassword('hidden_WEP_A','WEP_Key_A')" onclick="hiddenPassword('hidden_WEP_A','WEP_Key_A')" checked>
+			<label for="hidden_WEP_A">hidden</label>
+			</div>
+			
+			<div id="lWpaEncryption_A" class="inlineDiv">		
+			<label class="subtt2" style="width:180px">Password:</label>
+			<input maxlength="64" id="WPA_PSK_KEY_A" type="password" value="~*WPA_PSK_KEY_A~">				
+			<input name="hidden_A" id="hidden_A" type="checkbox" onchange="hiddenPassword('hidden_A','WPA_PSK_KEY_A')" onclick="hiddenPassword('hidden_A','WPA_PSK_KEY_A')" checked>
+			<label for="hidden_A">hidden</label>
+			</div>
+	
+			<div id="nwVisibility" class="inlineDiv" style="margin-top:-12px">
+			<label id="lNwVisiStatus"  class="subtt2" style="width:180px">SSID Stealth:</label><span id="wifiHiden"></span>
+				<input type="radio" name= "AP_HIDE_A_ID" id="AP_HIDE_A" value="0" ~cAP_HIDE_A:1:0~><label for="AP_HIDE_A">Enabled</label>
+				<input type="radio" name= "AP_HIDE_A_ID" id="AP_HIDE_A_DISABLED" value="1" ~cAP_HIDE_A:0:1~><label for="AP_HIDE_A_DISABLED">Disabled</label>				
+			</div>	
+			
+			<div class="inlineDiv">
+			<label class="subtt2" style="width:180px">Privacy Separator:</label><span id="wifiHiden"></span>
+				<input type="radio" name= "AP_Separator_A_ID" value="1" id="AP_Separator_A" ~cAP_Separator_A:1:1~><label for="AP_Separator_A">Enabled</label>
+				<input type="radio" name= "AP_Separator_A_ID" value="0" id="AP_Separator_A_Disable" ~cAP_Separator_A:0:0~><label for="AP_Separator_A_Disable">Disabled</label>				
+			</div>
+		</div>
+			
+			<div id="SSID_B" style="display: none">
+				<div class="inlineDiv">
+				<label class="subtt2" style="width:180px">SSID:</label><span id="wifissid"></span>
+				<input id="AP_SSID_B" maxlength="32" style="padding-left:5px;" type="text" value='~*AP_SSID_B~'>
+				</div>
+				<div id="nwSecurity" class="inlineDiv">	
+				<label id="lWireSecurity"  class="subtt2" style="width:180px">Security:</label>
+				<select id="AP_SECMODE_B" onChange="change_authentication(2, 'AP_SECMODE_B');">
+				<option value="OPEN" ~sAP_CYPHER_B:NONE:NONE~>Open</option>
+				<option value="WEP" ~sAP_CYPHER_B:WEP:AES/TKIP~>WEP</option>				
+				<option value="WPA2-PSK" ~sAP_CYPHER_B:AES:AES/TKIP~>WPA2-PSK(AES)</option>
+				<option value="WPA-PSK/WPA2-PSK" ~sAP_CYPHER_B:AES/TKIP:AES/TKIP~>WPA/WPA2-PSK (AES/TKIP)</option>
+				</select>
+				</div>
+				<div id="lWpaEncryption_WEP_B" class="inlineDiv" style="display: none">		
+				<label class="subtt2" style="width:180px">WEP Key:</label>
+				<input maxlength="64" id="WEP_Key_B" type="password" value="~*WEP_Key_B~">				
+				<input name="hidden_WEP_B" id="hidden_WEP_B" type="checkbox" onchange="hiddenPassword('hidden_WEP_B','WEP_Key_B')" onclick="hiddenPassword('hidden_WEP_B','WEP_Key_A')" checked>
+				<label for="hidden_WEP_B">hidden</label>
+				</div>			
+				<div id="lWpaEncryption_B" class="inlineDiv">		
+				<label class="subtt2" style="width:180px">Password:</label>
+				<input maxlength="64" id="WPA_PSK_KEY_B" type="password" value="~*WPA_PSK_KEY_B~">				
+				<input name="hidden_B" id="hidden_B" type="checkbox" onchange="hiddenPassword('hidden_B','WPA_PSK_KEY_B')" onclick="hiddenPassword('hidden_B','WPA_PSK_KEY_B')" checked>
+				<label for="hidden_B">hidden</label>
+				</div>
+				
+				
+				<div id="nwVisibility" class="inlineDiv" style="margin-top:-12px">
+				<label class="subtt2" style="width:180px">SSID Stealth:</label><span id="wifiHiden"></span>
+					<input type="radio" name="AP_HIDE_B_ID" id="AP_HIDE_B" value="0" ~cAP_HIDE_B:1:0~><label for="AP_HIDE_B">Enabled</label>
+					<input type="radio" name="AP_HIDE_B_ID" id="AP_HIDE_B_DISABLED" value="1" ~cAP_HIDE_B:0:1~><label for="AP_HIDE_B_DISABLED">Disabled</label>				
+				</div>
+				<div class="inlineDiv">
+				<label class="subtt2" style="width:180px">Privacy Separator:</label>
+					<input type="radio" name="AP_Separator_B_ID" value="1" id="AP_Separator_B" ~cAP_Separator_B:1:1~><label for="AP_Separator_B">Enabled</label>
+					<input type="radio" name="AP_Separator_B_ID" value="0" id="AP_Separator_B_Disable" ~cAP_Separator_B:0:0~><label for="AP_Separator_B_Disable">Disabled</label>				
+				</div>			
+				<div id="web_access" class="inlineDiv" >
+				<label id="lNwVisiStatus"  class="subtt2" style="width:180px">Access the Web Interface:</label>
+					<input type="radio" value="1" name="SSIDB_Web" id="SSIDB_Web" ~cSSIDB_ACCESSWEB_ENABLE:1:1~><label for="SSIDB_Web">Allow</label>
+					<input type="radio" value="0" name="SSIDB_Web" id="SSIDB_Web_Deny" ~cSSIDB_ACCESSWEB_ENABLE:0:0~><label for="SSIDB_Web_Deny" style="padding-left:20px">Deny</label>				
+			    </div>				
+			</div>
+		</div>
+		</div>	
+		<div class="formBox" id="divPrimaryNetworkFormBox" align="center">
+		<label class="error" id="lPassErrorMesPN2" style="display: none"></label>
+		</div>
+		<div class="buttonStyle" align="left" id="divSavePrimaryNetworkData">		 
+			<input id="btUpdate" value="Apply" onclick="validate_all()" type="button" ><!--Cruise button done-->
+			<input id="btBigUpdate" value="Reset Wi-Fi settings to default" onclick="ResetWifiDefault()" type="button" style="width:220px;height:220px; margin-left:8px">
+		</div>
+               </div>
+	 <div id="divPrimaryNetworkRestarting" align="left" style="display:none">
+		<label class="warm" id="lPassErrorMesPN" style="margin-left:25px;margin-bottom:2px">Apply new Wi-Fi settings now. Please wait for several seconds to activate Wi-Fi function.</label>
+        <label class="warm" id="lPassErrorMesPN" style="margin-left:25px;margin-bottom:2px">You may need to change the Wi-Fi password of your devices in order to connect to your device.
+		</label>
+		<label class="warm" id="lPassErrorMesPN" style="margin-left:25px">If this page is not refreshed in one minute correctly, please manually connect your devices to device and login to Web UI again.
+		</label>	
+		<br><br>
+		<div align="center">		
+		<img src="/images/loading.gif" width="100" height="100"> 	
+		</div>
+	</div>
+</div>
+</div>
+</form>
+</body>
+</html>
