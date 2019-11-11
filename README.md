@@ -23,10 +23,10 @@
  3. git functions
  
     查看目前git電腦使用者
-    cat ~/.gitconfig
+     # cat ~/.gitconfig
  
     由git commit上刪除檔案
-    git rm –cached [檔案]
+     # git rm –cached [檔案]
     
  -------------------------------------------------------------------------------------------- 
 
